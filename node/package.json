@@ -1,0 +1,14 @@
+{
+  "name": "paintdotnet-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Paint.NET MCP server hosted by node.exe so Smart App Control can launch it.",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.20.2",
+    "zod": "^3.25.76"
+  }
+}

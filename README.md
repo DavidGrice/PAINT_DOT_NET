@@ -24,6 +24,20 @@ Restart Paint.NET after installing. The plugin assembly file is `PdnMcp.dll`. Pa
 
 Uninstall by deleting the plugin folder and removing `[mcp_servers.paintdotnet]` from `config.toml`.
 
+## Node server
+
+Grok launches `node.exe`, which is signed by the OpenJS Foundation, and `node/server.mjs`. That process speaks MCP on stdio. UI Automation and pixel slots run inside Windows PowerShell, which is also signed. The unsigned .NET server under `%LOCALAPPDATA%\PaintDotNetMcp\server` remains for builds, and Smart App Control still blocks `dotnet exec` of it.
+
+```toml
+[mcp_servers.paintdotnet]
+command = "node"
+args = ['D:\CODING\MCP\PAINT_DOT_NET\node\server.mjs']
+startup_timeout_sec = 60
+enabled = true
+```
+
+From `node`, `node smoke.mjs` lists the tools and calls `pdn_status`. Logs from the server go to stderr.
+
 ## How a call works
 
 `document_info` and `document_snapshot` open **Effects → MCP → MCP Inspect...**, copy metadata (and, for a snapshot, pixels) out, and cancel the dialog. On Paint.NET 5.1.12 that cancel leaves Edit → Undo disabled.
@@ -89,7 +103,8 @@ It does not drive the brush, eraser, clone stamp, wand, gradient, or shape tools
 - `src/PaintDotNet.Mcp.Raster` — the BGRA rasterizer and PNG IO.
 - `src/PaintDotNet.Mcp.Plugin` — Inspect and Apply effects. Paint.NET assemblies are referenced with `Private=false` and are not copied.
 - `src/PaintDotNet.Mcp.UiDriver` — FlaUI driver.
-- `src/PaintDotNet.Mcp.Server` — stdio MCP server. Logs go to stderr.
+- `src/PaintDotNet.Mcp.Server` — the .NET stdio server. Smart App Control blocks `dotnet exec` of this unsigned build.
+- `node` — the server Grok launches. `server.mjs` is MCP stdio. `host.ps1` drives menus and pixel slots.
 - `src/PaintDotNet.Mcp.Spike` — manual smoke test. `dotnet run --project src/PaintDotNet.Mcp.Spike -- --draw` paints a 10×10 red rectangle at (0,0) when Paint.NET is already open with the plugin loaded.
 - `tests/PaintDotNet.Mcp.Tests` — protocol, rasterizer, rewriter, and session tests. They do not need Paint.NET.
 
@@ -119,6 +134,6 @@ Still open on a live canvas:
 - A partial selection was not drawn, because a drag would go to the foreground application. `ignoreSelection` still sets `DisableSelectionClipping`.
 - AutomationIds for New, Save As, and Layer Properties were not recorded. The driver looks them up by English names and returns the control tree when a lookup misses.
 - Only an English UI was available. The walk still keys off the literal submenu name `MCP`.
-- `dotnet exec` of the MCP server is still expected to fail under Smart App Control until the server binary is signed or the policy allows it.
+- `dotnet exec` of the .NET MCP server is still blocked by Smart App Control. The Node server is the process Grok starts. A local `node smoke.mjs` run listed every tool and `pdn_status` returned `not_running` while Paint.NET was closed.
 
 Logs: `%LOCALAPPDATA%\PaintDotNetMcp\logs\plugin-{pid}.log`.
