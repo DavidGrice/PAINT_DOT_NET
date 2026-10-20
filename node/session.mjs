@@ -580,10 +580,13 @@ export class PaintSession {
     try {
       const bridge = await this.client(pid);
       raw = await bridge.roundTrip(request, () => this.host.call({ cmd: "effect", pid, name: "MCP Inspect" }, 20000), 40000);
-    } catch {
+    } catch (error) {
       this.drop(pid);
       try { await this.host.call({ cmd: "dismiss", pid, commit: false }); } catch { /* The dialog may already be gone. */ }
-      return { status: "busy", pid, message: "Inspect timed out. Escape was sent." };
+      if (error.code === "timeout") {
+        return { status: "busy", pid, message: "Inspect timed out. Escape was sent." };
+      }
+      return { status: "error", pid, message: error.message };
     }
     const reverted = await this.revertIfGrew(pid, before);
     try { await this.host.call({ cmd: "dismiss", pid, commit: false }); } catch { /* RequestClose may have closed it. */ }

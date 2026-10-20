@@ -67,12 +67,20 @@ export class Bridge {
         reject: rejectWaiter,
       });
     });
+    const guarded = response.catch((error) => {
+      throw error;
+    });
     try {
       await this.send(message);
       if (trigger) await trigger();
-      return await response;
+      return await guarded;
     } catch (error) {
       this.destroy();
+      try {
+        await guarded;
+      } catch {
+        // destroy() rejects the waiter that this call already failed.
+      }
       throw error;
     }
   }
