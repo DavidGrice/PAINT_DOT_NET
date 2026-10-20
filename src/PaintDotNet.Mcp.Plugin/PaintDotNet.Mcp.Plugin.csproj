@@ -1,0 +1,73 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RootNamespace>PaintDotNet.Mcp.Plugin</RootNamespace>
+    <!-- Paint.NET's plugin scan skips every DLL whose file name starts with "PaintDotNet." -->
+    <AssemblyName>PdnMcp</AssemblyName>
+    <PlatformTarget>x64</PlatformTarget>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);MSB3277</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PaintDotNet.Mcp.Protocol\PaintDotNet.Mcp.Protocol.csproj" />
+    <ProjectReference Include="..\PaintDotNet.Mcp.Raster\PaintDotNet.Mcp.Raster.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="PaintDotNet.Base">
+      <HintPath>$(PaintDotNetDir)\PaintDotNet.Base.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="PaintDotNet.ComponentModel">
+      <HintPath>$(PaintDotNetDir)\PaintDotNet.ComponentModel.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="PaintDotNet.Core">
+      <HintPath>$(PaintDotNetDir)\PaintDotNet.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="PaintDotNet.Data">
+      <HintPath>$(PaintDotNetDir)\PaintDotNet.Data.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="PaintDotNet.Effects.Core">
+      <HintPath>$(PaintDotNetDir)\PaintDotNet.Effects.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="PaintDotNet.ObjectModel">
+      <HintPath>$(PaintDotNetDir)\PaintDotNet.ObjectModel.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="PaintDotNet.Fundamentals">
+      <HintPath>$(PaintDotNetDir)\PaintDotNet.Fundamentals.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="PaintDotNet.Framework">
+      <HintPath>$(PaintDotNetDir)\PaintDotNet.Framework.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="PaintDotNet.Primitives">
+      <HintPath>$(PaintDotNetDir)\PaintDotNet.Primitives.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="PaintDotNet.Windows">
+      <HintPath>$(PaintDotNetDir)\PaintDotNet.Windows.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="PaintDotNet.Windows.Core">
+      <HintPath>$(PaintDotNetDir)\PaintDotNet.Windows.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="PaintDotNet.Windows.Framework">
+      <HintPath>$(PaintDotNetDir)\PaintDotNet.Windows.Framework.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <Target Name="RequirePaintDotNet" BeforeTargets="ResolveAssemblyReferences">
+    <Error Condition="!Exists('$(PaintDotNetDir)\PaintDotNet.Effects.Core.dll')"
+           Text="Paint.NET 5.1+ was not found at '$(PaintDotNetDir)'. Set PaintDotNetDir or PAINTDOTNET_DIR to the install folder." />
+  </Target>
+</Project>

@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <Version>0.1.0</Version>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <PaintDotNetDir Condition="'$(PaintDotNetDir)' == ''">$(PAINTDOTNET_DIR)</PaintDotNetDir>
+    <PaintDotNetDir Condition="'$(PaintDotNetDir)' == ''">C:\Program Files\paint.net</PaintDotNetDir>
+  </PropertyGroup>
+</Project>

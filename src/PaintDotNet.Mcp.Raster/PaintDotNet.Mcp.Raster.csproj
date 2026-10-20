@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RootNamespace>PaintDotNet.Mcp.Raster</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PaintDotNet.Mcp.Protocol\PaintDotNet.Mcp.Protocol.csproj" />
+  </ItemGroup>
+</Project>
