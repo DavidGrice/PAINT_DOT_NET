@@ -498,10 +498,13 @@ export class PaintSession {
           const after = await this.tryHistory(pid);
           if (after != null && after > before) {
             await this.host.call({ cmd: "menu", pid, top: "Edit", item: "Undo" });
-            return { status: "reverted", pid, message: "Apply timed out. Escape was sent and the new history entry was undone." };
+            return { status: "reverted", pid, message: "Apply failed after a history entry appeared. Escape was sent and that entry was undone. " + error.message };
           }
         }
-        return { status: "busy", pid, message: "Apply timed out. Escape was sent. If a dialog is still open, close it before the next command." };
+        if (error.code === "timeout") {
+          return { status: "busy", pid, message: "Apply timed out. Escape was sent. If a dialog is still open, close it before the next command." };
+        }
+        return { status: "error", pid, message: error.message };
       }
       try { await this.host.call({ cmd: "dismiss", pid, commit: !!raw.committed }); } catch { /* RequestClose may have closed it. */ }
       if (raw.type !== "batchResult") return { status: "error", pid, message: "Unexpected bridge response." };

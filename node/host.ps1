@@ -92,12 +92,22 @@ function Invoke-El($el) {
 }
 
 function Get-MenuBar($window) {
+    # WinForms exposes a System menu bar before PdnMainMenu. FindFirst would
+    # return that bar, whose only child is System, and miss File through Effects.
+    $bars = @()
     foreach ($typeName in @('MenuBar', 'Menu')) {
         $type = [System.Windows.Automation.ControlType]::$typeName
         $cond = New-Object System.Windows.Automation.PropertyCondition (
             [System.Windows.Automation.AutomationElement]::ControlTypeProperty, $type)
-        $found = $window.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $cond)
-        if ($found) { return $found }
+        $bars += @($window.FindAll([System.Windows.Automation.TreeScope]::Descendants, $cond))
+    }
+    foreach ($bar in $bars) {
+        if ($bar.Current.AutomationId -eq 'PdnMainMenu') { return $bar }
+    }
+    foreach ($bar in $bars) {
+        foreach ($child in (Get-Children $bar)) {
+            if ($child.Current.Name -eq 'File') { return $bar }
+        }
     }
     throw 'Paint.NET has no UI Automation menu bar.'
 }
