@@ -126,7 +126,7 @@ export class PaintSession {
 
   documentCreate(args) {
     return this.run(() => this.withPid(args, true, async (pid) => {
-      await this.host.call({ cmd: "newDocument", pid, width: args.width, height: args.height }, 20000);
+      await this.host.call({ cmd: "newDocument", pid, width: args.width, height: args.height }, 30000);
       return this.verify(pid, (doc) => doc.width === args.width && doc.height === args.height
         ? null
         : `The document is ${doc.width}x${doc.height} after New.`);
@@ -135,7 +135,7 @@ export class PaintSession {
 
   documentOpen(args) {
     return this.run(() => this.withPid(args, true, async (pid) => {
-      await this.host.call({ cmd: "openPath", pid, path: args.path }, 20000);
+      await this.host.call({ cmd: "openPath", pid, path: args.path }, 30000);
       const modal = await this.host.call({ cmd: "modalText", pid });
       if (modal.text) {
         return { status: "error", pid, message: "Paint.NET showed a dialog after Open. It was left open. " + modal.text, modalOpen: true, modalText: modal.text };
@@ -150,7 +150,7 @@ export class PaintSession {
 
   documentSave(args) {
     return this.run(() => this.withPid(args, true, async (pid) => {
-      const saved = await this.host.call({ cmd: "save", pid });
+      const saved = await this.host.call({ cmd: "save", pid }, 20000);
       if (!saved.saved) {
         return { status: "error", pid, message: "This document has no file name yet. Call document_save_as with a path." };
       }
@@ -163,7 +163,7 @@ export class PaintSession {
       if (fs.existsSync(args.path) && !args.confirm) {
         return { status: "error", pid, message: `Refused to overwrite ${args.path}. Call again with confirm=true.` };
       }
-      await this.host.call({ cmd: "saveAs", pid, path: args.path, confirm: !!args.confirm }, 20000);
+      await this.host.call({ cmd: "saveAs", pid, path: args.path, confirm: !!args.confirm }, 30000);
       if (!fs.existsSync(args.path)) {
         return { status: "verify_failed", pid, message: `Save As finished but ${args.path} is not on disk.` };
       }

@@ -63,27 +63,27 @@ tool("history_undo", "Undo", "Invokes Edit → Undo and then reads the document 
 tool("history_redo", "Redo", "Invokes Edit → Redo and then reads the document again.", common, (args) => session.historyRedo(args));
 
 tool("document_create", "New document",
-  "Opens File → New and fills the size dialog, then checks that document_info reports the new size. width and height are pixels.",
+  "Opens File → New and finishes that dialog. It sets the pixel Width and Height, not the print-size fields. The New dialog is a child of the main window. If Maintain aspect ratio changes the other number, the tool turns that off and sets both again. It does not press OK until both pixel numbers match. width and height are pixels. Do not retry this call while the dialog is open.",
   { ...common, width: z.number().int(), height: z.number().int() },
   (args) => session.documentCreate(args));
 
 tool("document_open", "Open document",
-  "Opens File → Open and selects path. If Paint.NET shows an error dialog, the text is returned and the dialog is left open.",
+  "Opens File → Open, types path into the file-name field, reads it back, and presses Open. The Open dialog is a child of the main window. If Paint.NET shows an error dialog, the text is returned and the dialog is left open. Do not retry this call while a dialog is open.",
   { ...common, path: z.string() },
   (args) => session.documentOpen(args));
 
 tool("document_save", "Save",
-  "Invokes File → Save. If the document is still untitled, the call fails and tells you to use document_save_as.",
+  "Clicks File → Save and finishes the dialogs that follow. If Save Configuration opens, the tool presses OK and leaves that dialog's current settings, including bit depth. If the document is still untitled, the call fails and tells you to use document_save_as. Do not retry this call while a dialog is open.",
   common,
   (args) => session.documentSave(args));
 
 tool("document_save_as", "Save as",
-  "Opens File → Save As and writes path. Overwriting an existing file requires confirm=true. The server does not delete files and does not write anywhere except path.",
+  "Opens File → Save As, types path into the file-name field, and reads it back before pressing Save. It will not press Save while that field shows a different name. It then presses OK on Save Configuration and leaves that dialog's current settings, including bit depth. Confirm Save As is nested inside Save As and is answered only when confirm=true. Without confirm, the tool clicks No and closes Save As. Do not retry this call while a dialog is open. The server does not delete files and does not write anywhere except path.",
   { ...common, path: z.string(), confirm: z.boolean().optional() },
   (args) => session.documentSaveAs(args));
 
 tool("document_close", "Close document",
-  "Invokes File → Close. A document with unsaved changes returns dirty and leaves the prompt open unless save=true, or discard=true together with confirm=true.",
+  "Clicks File → Close and answers the unsaved-changes prompt when asked. A document with unsaved changes returns dirty and leaves the prompt open unless save=true, or discard=true together with confirm=true. Do not retry this call while that prompt is open.",
   { ...common, save: z.boolean().optional(), discard: z.boolean().optional(), confirm: z.boolean().optional() },
   (args) => session.documentClose(args));
 
@@ -111,7 +111,7 @@ tool("layer_select", "Select layer",
   (args) => session.layerSelect(args));
 
 tool("layer_properties", "Layer properties",
-  "Opens Layers → Layer Properties. Sets whichever of name, opacity, visible, and blendMode are present. opacity is 0 to 1, the same scale document_info returns. The dialog is given that value as a 0 to 255 byte. blendMode uses the name document_info returns, such as Normal or Multiply. The result is read back. The dialog control names were not recorded on a live canvas, so a miss returns the lookup error.",
+  "Opens Layers → Layer Properties and finishes it. Name is the text field. Opacity is 0 to 1, the same scale document_info returns, and the dialog is given that value as a 0 to 255 byte. blendMode uses the name document_info returns, such as Normal or Multiply, on the blend-mode list. The dialog is closed with Cancel if a field does not match. Visible is changed only when the checkbox reports a toggle state.",
   {
     ...common,
     name: z.string().optional(),
